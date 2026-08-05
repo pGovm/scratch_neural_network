@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix, classification_report
 
-# Importing from your group's other scripts
+# Importing from our other scripts
 from model_and_training import MLP
 from Final_Project_Data_Preprocessing import test_loader
 
