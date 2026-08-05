@@ -36,7 +36,7 @@ def training(model, loader, criterion, optimizer, device):
     total_loss = 0.0
 
     progress_bar = tqdm(loader, desc="Training", leave=False)
-    for images, labels in loader:
+    for images, labels in progress_bar:
         images, labels = images.to(device), labels.to(device)
 
         optimizer.zero_grad()
@@ -56,7 +56,7 @@ def evaluate(model, loader, criterion, device):
     total_loss = 0.0
 
     progress_bar = tqdm(loader, desc="Evaluating", leave=False)
-    for images, labels, in loader:
+    for images, labels, in progress_bar:
         images, labels = images.to(device), labels.to(device)
 
         outputs = model(images)
@@ -100,13 +100,13 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, max_epoch
 
 if __name__ == "__main__":
     BASE_DIR = Path(__file__).parent
-    common_path = BASE_DIR / "output"
-    os.makedirs(common_path, exist_ok=True)
+    output_path = BASE_DIR / "output"
+    os.makedirs(output_path, exist_ok=True)
 
     # Standard hyperparameters used for neural network training
     learning_rate = 0.001
     epochs = 100
-    patience = 5
+    patience = 3
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -121,13 +121,11 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     model, best_val_loss, history = train_model(model, train_loader, validation_loader, criterion, optimizer, epochs, patience, device)
 
-    save_path = os.path.join(common_path, "mlp_mnist_best.pt")
+    save_path = os.path.join(output_path, "mlp_mnist_best.pt")
     checkpoint = {
         "model_state_dict": model.state_dict(),
         "train_losses": history["train_losses"],
         "val_losses": history["val_losses"],
-        "hidden_sizes": (256, 128),
-        "dropout": 0.2,
     }
     torch.save(checkpoint, save_path)
 
