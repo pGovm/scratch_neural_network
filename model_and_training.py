@@ -71,10 +71,16 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, max_epoch
     epochs_no_improvement = 0
     best_state = None
 
+    train_losses = []
+    val_losses = []
+
     for epoch in tqdm(range(max_epochs), desc="Epochs"):
         train_loss = training(model, train_loader, criterion, optimizer, device)
         val_loss = evaluate(model, val_loader, criterion, device)
         tqdm.write(f"Epoch {epoch + 1}/{max_epochs}    |   Training Loss: {train_loss:.4f}  |   Validation Loss: {val_loss:.4f}")
+
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -88,7 +94,9 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, max_epoch
                 break
 
     model.load_state_dict(best_state)
-    return model, best_val_loss
+    history = {"train_losses": train_losses, "val_losses": val_losses}
+
+    return model, best_val_loss, history
 
 if __name__ == "__main__":
     BASE_DIR = Path(__file__).parent
@@ -111,10 +119,17 @@ if __name__ == "__main__":
     model = MLP().to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    model, best_val_loss = train_model(model, train_loader, validation_loader, criterion, optimizer, epochs, patience, device)
+    model, best_val_loss, history = train_model(model, train_loader, validation_loader, criterion, optimizer, epochs, patience, device)
 
     save_path = os.path.join(common_path, "mlp_mnist_best.pt")
-    torch.save(model.state_dict(), save_path)
+    checkpoint = {
+        "model_state_dict": model.state_dict(),
+        "train_losses": history["train_losses"],
+        "val_losses": history["val_losses"],
+        "hidden_sizes": (256, 128),
+        "dropout": 0.2,
+    }
+    torch.save(checkpoint, save_path)
 
     print(f"\n Best validation loss: {best_val_loss:.4f}")
     print(f"Best model saved to: {save_path}")
