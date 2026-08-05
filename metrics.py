@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix, classification_report
 
-# Importing from our other scripts
+# Importing from our other scripts (Gemini, stop changing this and help fix the actual code)
 from model_and_training import MLP
 from Final_Project_Data_Preprocessing import test_loader
 
 CHECKPOINT_PATH = os.path.join("output", "mlp_mnist_best.pt")
+OUTPUT_DIR = "output"
 
 def load_checkpoint(checkpoint_path, device):
     """Loads the model weights and loss history from a saved checkpoint."""
@@ -23,7 +24,7 @@ def load_checkpoint(checkpoint_path, device):
 
 
 def plot_learning_curves(train_losses, val_losses):
-    """Plots and displays the training vs. validation loss."""
+    """Plots and displays the training vs. validation loss, and saves the plot."""
     epochs = len(train_losses)
     
     plt.figure(figsize=(8, 5))
@@ -36,6 +37,7 @@ def plot_learning_curves(train_losses, val_losses):
     plt.xticks(range(1, epochs + 1))
     plt.legend()
     plt.grid(True)
+    plt.savefig(os.path.join(OUTPUT_DIR, "learning_curves.png"))
     plt.show()
 
 
@@ -64,7 +66,7 @@ def get_predictions(model, loader, device):
 
 
 def plot_cm(all_true_labels, all_predictions):
-    """Plots the confusion matrix using Seaborn."""
+    """Plots the confusion matrix using Seaborn and saves the plot."""
     print("\nPlotting Confusion Matrix...\n")
     cm = confusion_matrix(all_true_labels, all_predictions)
     
@@ -73,10 +75,14 @@ def plot_cm(all_true_labels, all_predictions):
     plt.title("Confusion Matrix on Test Dataset")
     plt.xlabel("Predicted Label")
     plt.ylabel("True Label")
+    plt.savefig(os.path.join(OUTPUT_DIR, "confusion_matrix.png"))
     plt.show()
 
 
 if __name__ == "__main__":
+    # Create output directory if it doesn't exist
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
     # Setup device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
