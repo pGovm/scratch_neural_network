@@ -5,7 +5,7 @@ from torchvision import datasets, transforms
 
 import matplotlib.pyplot as plt
 
-random_seed = 69
+random_seed = 42
 torch.manual_seed(random_seed)
 
 
