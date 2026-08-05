@@ -72,20 +72,3 @@ images, labels = next(iter(train_loader))
 print("\nImage batch shape:", images.shape)
 print("Label batch shape:", labels.shape)
 print("First 10 labels:", labels[:10])
-
-def denormalize(image):
-    return image * 0.3081 + 0.1307
-
-
-figure = plt.figure(figsize=(10, 4))
-
-for index in range(10):
-    image = denormalize(images[index])
-
-    plt.subplot(2, 5, index + 1)
-    plt.imshow(image.squeeze(), cmap="gray")
-    plt.title(f"Label: {labels[index].item()}")
-    plt.axis("off")
-
-plt.tight_layout()
-plt.show()
