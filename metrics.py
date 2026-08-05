@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix, classification_report
 
-# Importing from our other scripts 
+
 from model_and_training import MLP
 from Final_Project_Data_Preprocessing import test_loader
 
@@ -48,7 +48,7 @@ def get_predictions(model, loader, device):
     all_predictions = []
     all_true_labels = []
 
-    # No gradient tracking needed for evaluation
+    
     with torch.no_grad():
         for batch_images, batch_labels in loader:
             batch_images = batch_images.to(device)
@@ -56,7 +56,7 @@ def get_predictions(model, loader, device):
             
             outputs = model(batch_images)
             
-            # Get the index of the highest probability class
+            
             _, predicted = torch.max(outputs.data, 1)
             
             all_predictions.extend(predicted.cpu().numpy())
@@ -80,14 +80,11 @@ def plot_cm(all_true_labels, all_predictions):
 
 
 if __name__ == "__main__":
-    # Create output directory if it doesn't exist
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    # Setup device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    # Step 1: Load the checkpoint
     try:
         model, train_losses, val_losses = load_checkpoint(CHECKPOINT_PATH, device)
         print("Checkpoint loaded successfully.")
@@ -96,15 +93,15 @@ if __name__ == "__main__":
         print("Make sure your group members have run the training script to generate it.")
         exit()
 
-    # Step 2: Plot the training/validation loss
+
     plot_learning_curves(train_losses, val_losses)
 
-    # Step 3: Get predictions
+
     true_labels, predictions = get_predictions(model, test_loader, device)
 
-    # Step 4: Print the Classification Report
+    
     print("Classification Report:")
     print(classification_report(true_labels, predictions, digits=4))
 
-    # Step 5: Plot the Confusion Matrix
+   
     plot_cm(true_labels, predictions)
